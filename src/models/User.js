@@ -43,10 +43,10 @@ const userSchema = new mongoose.Schema(
   }
 );
 
-const hmac = crypto.createHmac("sha256", SECRET_KEY);
-
 // this is event handler middleware which is just envoke before sabving data to the database
 userSchema.pre("save", async function (next) {
+  const hmac = crypto.createHmac("sha256", SECRET_KEY);
+
   if (!this.isModified("password")) return next(); // this check if only password feild is nmodified then it will run otherwise not.
 
   // Use HMAC with SHA256 algorithm
@@ -55,6 +55,8 @@ userSchema.pre("save", async function (next) {
 });
 
 userSchema.methods.isPasswordCorrect = async function (password) {
+  const hmac = crypto.createHmac("sha256", SECRET_KEY);
+
   // Use HMAC with SHA256 algorithm to hash the provided password with the secret key
   const hashedPassword = hmac.update(password).digest("hex");
 

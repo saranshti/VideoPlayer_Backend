@@ -232,7 +232,7 @@ const getCurrentUser = asyncHandler(async (req, res) => {
 const updateAccountDetails = asyncHandler(async (req, res) => {
   const { fullName, email } = req.body;
 
-  if (!fullName || !email) {
+  if (!fullName && !email) {
     throw new ApiError(400, "All fields are required");
   }
 
@@ -240,8 +240,8 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
     req.user?._id,
     {
       $set: {
-        fullName: fullName || req.user?.fullName,
-        email: email || req.user?.email,
+        fullName: fullName,
+        email: email,
       },
     },
     { new: true }
@@ -251,7 +251,7 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
 });
 
 const updateUserAvatar = asyncHandler(async (req, res) => {
-  const avtarLocalPath = req.file?.path;
+  const avtarLocalPath = req?.file?.path;
 
   if (!avtarLocalPath) {
     throw new ApiError(400, "Avatar Not Found.");
@@ -285,6 +285,7 @@ export {
   loginUser,
   logoutUser,
   refreshAccessToken,
+  updateAccountDetails,
   changeCurrentPassword,
   getCurrentUser,
   updateUserAvatar,
