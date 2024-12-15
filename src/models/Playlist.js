@@ -4,7 +4,10 @@ const playlistSchema = new mongoose.Schema(
   {
     name: { type: String, required: true },
     description: { type: String, required: true },
-    owner: { type: String, required: true },
+    owner: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User", // Reference to the 'Video' model
+    },
     video: [
       {
         type: mongoose.Schema.Types.ObjectId,
