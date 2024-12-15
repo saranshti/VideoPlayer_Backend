@@ -21,6 +21,9 @@ coverage/
 dist/
 build/
 
+# Public Folder
+public/
+
 # Temporary files
 *.swp
 *.swo

@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-var aggregatePaginate = require("mongoose-aggregate-paginate-v2");
+import aggregatePaginate from "mongoose-aggregate-paginate-v2";
 
 const videoSchema = new mongoose.Schema(
   {
@@ -7,15 +7,14 @@ const videoSchema = new mongoose.Schema(
     thumbnail: { type: String, required: true },
     title: { type: String, required: true },
     description: { type: String },
-    duration: { type: Number },
+    duration: { type: String },
     views: { type: Number, default: 0 }, // Adding Default Value
     isPublished: { type: Boolean, default: true },
-    owner: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User", // Reference to the 'User' model
-      },
-    ],
+    owner: {
+      type: mongoose.Schema.Types.ObjectId, // Single reference to the User model
+      ref: "User", // Reference to the 'User' model
+      required: true, // Ensure owner is always provided
+    },
   },
   {
     timestamps: true, // CreatedAt and UpdatedAt
