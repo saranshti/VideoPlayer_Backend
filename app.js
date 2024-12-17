@@ -41,32 +41,19 @@ app.use(
 
 //routes import
 import userRouter from "./src/routes/user.routes.js";
-
-app.use("/api/v1/users", userRouter);
-
-//routes import
 import videoRouter from "./src/routes/video.routes.js";
-
-app.use("/api/v1/video", videoRouter);
-
-//routes import
 import commentRouter from "./src/routes/comment.routes.js";
-
-app.use("/api/v1/comment", commentRouter);
-
-//routes import
 import tweetRouter from "./src/routes/tweet.routes.js";
-
-app.use("/api/v1/tweet", tweetRouter);
-
-//routes import
 import playlistRouter from "./src/routes/playlist.routes.js";
-
-app.use("/api/v1/playlist", playlistRouter);
-
-//routes import
 import likeRouter from "./src/routes/like.routes.js";
 
-app.use("/api/v1/like", likeRouter);
+const startRoute = "/api/v1/";
+
+app.use(`${startRoute}users`, userRouter);
+app.use(`${startRoute}video`, videoRouter);
+app.use(`${startRoute}comment`, commentRouter);
+app.use(`${startRoute}tweet`, tweetRouter);
+app.use(`${startRoute}playlist`, playlistRouter);
+app.use(`${startRoute}like`, likeRouter);
 
 export { app };
