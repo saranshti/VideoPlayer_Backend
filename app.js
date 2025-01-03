@@ -16,7 +16,7 @@ app.use(helmet());
 app.use(
   cors({
     origin: ORIGIN,
-    Credential: true, // allow only that user which is providing cookie
+    credentials: true, // allow only that user which is providing cookie
   })
 );
 
