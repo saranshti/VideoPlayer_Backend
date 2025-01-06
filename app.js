@@ -5,6 +5,7 @@ import { ORIGIN } from "./src/config/env.js";
 import cookieParser from "cookie-parser";
 import { logger } from "./src/config/logger.js";
 import helmet from "helmet";
+import { errorHandler } from "./src/middleware/error.middleware.js";
 
 //Created The Server
 const app = express();
@@ -55,5 +56,8 @@ app.use(`${startRoute}comment`, commentRouter);
 app.use(`${startRoute}tweet`, tweetRouter);
 app.use(`${startRoute}playlist`, playlistRouter);
 app.use(`${startRoute}like`, likeRouter);
+
+//global Error Handler
+app.use(errorHandler);
 
 export { app };
