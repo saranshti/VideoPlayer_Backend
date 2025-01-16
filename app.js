@@ -11,7 +11,7 @@ import { errorHandler } from "./src/middleware/error.middleware.js";
 const app = express();
 
 // add Due to Security Purpose
-app.use(helmet());
+app.use(helmet({ crossOriginResourcePolicy: false })); // used this allow video to stram on the frontend
 
 // used for access from fronted from different origin
 app.use(
@@ -57,7 +57,7 @@ app.use(`${startRoute}tweet`, tweetRouter);
 app.use(`${startRoute}playlist`, playlistRouter);
 app.use(`${startRoute}like`, likeRouter);
 
-//global Error Handler
+// Global Error Handler
 app.use(errorHandler);
 
 export { app };
