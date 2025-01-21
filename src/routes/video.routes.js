@@ -7,13 +7,14 @@ import {
   deleteVideo,
 } from "../controllers/video.controller.js";
 import { upload } from "../middleware/multer.middleware.js";
+import { uploadVideo } from "../middleware/upload.multer.middleware.js";
 import { verifyJWT } from "../middleware/auth.middleware.js";
 
 const router = Router();
 
 router.route("/video-create").post(
   verifyJWT,
-  upload.fields([
+  uploadVideo.fields([
     { name: "video", maxCount: 1 },
     { name: "thumbnail", maxCount: 1 },
   ]),
