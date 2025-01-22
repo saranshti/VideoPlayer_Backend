@@ -4,7 +4,6 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import Video from "../models/Video.js";
 import { uploadOnCloudinary } from "../utils/Cloudinary.js";
 import { mergeChunks } from "../utils/video.js";
-// import { fileURLToPath } from "url";
 import path from "path";
 import fs from "fs-extra";
 
@@ -18,67 +17,7 @@ const validateFields = (fields) => {
   }
 };
 
-// // createVideo function
-// const createVideo = asyncHandler(async (req, res) => {
-//   const user_id = req?.user?._id;
-
-//   const { title, description, isPublished, duration } = req.body;
-
-//   // Validate required fields
-//   validateFields([title, description]);
-
-//   // Check if thumbnail is uploaded
-//   const thumbnailLocalPath = req?.files?.thumbnail?.[0]?.path;
-//   if (!thumbnailLocalPath) {
-//     throw new ApiError(400, "No thumbnail image found.");
-//   }
-
-//   // Check if video file is uploaded
-//   const videoPath = req?.files?.video?.[0];
-//   const videoLocalPath = videoPath
-//     ? path.join(
-//         path.dirname(
-//           path.dirname(path.dirname(fileURLToPath(import.meta.url)))
-//         ),
-//         "./public/video/",
-//         videoPath.filename
-//       )
-//     : null;
-
-//   if (!videoLocalPath) {
-//     throw new ApiError(400, "No video file found.");
-//   }
-
-//   // Upload thumbnail to Cloudinary
-//   const thumbnail = await uploadOnCloudinary(thumbnailLocalPath);
-//   if (!thumbnail) {
-//     throw new ApiError(400, "Thumbnail upload failed.");
-//   }
-
-//   // Create the video document in DB
-//   const video = await Video.create({
-//     title,
-//     thumbnail: thumbnail.url,
-//     videoFile: videoLocalPath,
-//     duration,
-//     description,
-//     isPublished,
-//     owner: user_id,
-//   });
-
-//   // Fetch the created video to ensure it's correct
-//   const createdVideo = await Video.findById(video._id);
-
-//   if (!createdVideo) {
-//     throw new ApiError(500, "Internal server error while uploading video.");
-//   }
-
-//   // Return the response
-//   return res
-//     .status(201)
-//     .json(new ApiResponse(201, createdVideo, "Video uploaded successfully."));
-// });
-
+// createVideo function
 const createVideo = asyncHandler(async (req, res) => {
   const user_id = req?.user?._id;
 
@@ -164,6 +103,55 @@ const createVideo = asyncHandler(async (req, res) => {
     .json(new ApiResponse(201, createdVideo, "Video uploaded successfully."));
 });
 
+// Get VideoData by Id
+const getVideoById = asyncHandler(async (req, res) => {
+  const videos = await Video.find({ _id: req.params.id });
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, videos, "Videos fetched successfully"));
+});
+
+// Stream Video by Id
+const streamVideo = asyncHandler(async (req, res) => {
+  const range = req.headers.range;
+  if (!range) {
+    throw new ApiError(400, "Requires Range header.");
+  }
+  const videoId = req.params.id;
+  if (!videoId) {
+    throw new ApiError(400, "Video Not Found.");
+  }
+  const videos = await Video.find({ _id: videoId });
+  const videoPath = videos[0]?.videoFile;
+
+  const videoSize = fs.statSync(videoPath).size;
+
+  // Parse Range
+  // Example: "bytes=32324-"
+  const CHUNK_SIZE = 10 ** 6; // 1MB
+  const start = Number(range.replace(/\D/g, ""));
+  const end = Math.min(start + CHUNK_SIZE, videoSize - 1);
+
+  // Create headers
+  const contentLength = end - start + 1;
+  const headers = {
+    "Content-Range": `bytes ${start}-${end}/${videoSize}`,
+    "Accept-Ranges": "bytes",
+    "Content-Length": contentLength,
+    "Content-Type": "video/mp4",
+  };
+
+  // HTTP Status 206 for Partial Content
+  res.writeHead(206, headers);
+
+  // create video read stream for this particular chunk
+  const videoStream = fs.createReadStream(videoPath, { start, end });
+
+  // Stream the video chunk to the client
+  videoStream.pipe(res);
+});
+
 // Fetch videos by current user
 const getCurrentUserVideos = asyncHandler(async (req, res) => {
   const videos = await Video.find({ owner: req.user._id });
@@ -222,6 +210,8 @@ const deleteVideo = asyncHandler(async (req, res) => {
 
 export {
   createVideo,
+  getVideoById,
+  streamVideo,
   getCurrentUserVideos,
   getAllVideos,
   updateVideoDetails,

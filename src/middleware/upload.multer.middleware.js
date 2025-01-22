@@ -53,11 +53,8 @@ export const uploadVideo = multer({
       file.mimetype === "image/jpeg"
       // file.originalname.match(/\.(jpg|jpeg|png)$/)
     ) {
-      console.log("startsWith");
-
       cb(null, true);
     } else {
-      console.log("Error", file);
       cb(new Error("Not a video file. Please upload only videos."));
     }
   },
