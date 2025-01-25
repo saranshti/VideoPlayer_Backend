@@ -105,7 +105,10 @@ const createVideo = asyncHandler(async (req, res) => {
 
 // Get VideoData by Id
 const getVideoById = asyncHandler(async (req, res) => {
-  const videos = await Video.find({ _id: req.params.id });
+  const videos = await Video.findById(req.params.id).populate(
+    "owner",
+    "fullName avatar "
+  ); // get only fullName and avatar from the populated owner
 
   return res
     .status(200)
@@ -152,6 +155,26 @@ const streamVideo = asyncHandler(async (req, res) => {
   videoStream.pipe(res);
 });
 
+const viewVideo = asyncHandler(async (req, res) => {
+  const video = await Video.findById(req.params.id);
+
+  // Check if video exists
+  if (!video) {
+    throw new ApiError(400, "Video not found");
+  }
+
+  // Increment views atomically
+  video.views += 1;
+
+  const updatedVideo = await video.save();
+
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(200, updatedVideo, "Video views updated successfully")
+    );
+});
+
 // Fetch videos by current user
 const getCurrentUserVideos = asyncHandler(async (req, res) => {
   const videos = await Video.find({ owner: req.user._id });
@@ -163,7 +186,7 @@ const getCurrentUserVideos = asyncHandler(async (req, res) => {
 
 // Fetch all videos
 const getAllVideos = asyncHandler(async (req, res) => {
-  const videos = await Video.find({});
+  const videos = await Video.find({}).populate("owner", "fullName avatar ");
 
   return res
     .status(200)
@@ -212,6 +235,7 @@ export {
   createVideo,
   getVideoById,
   streamVideo,
+  viewVideo,
   getCurrentUserVideos,
   getAllVideos,
   updateVideoDetails,

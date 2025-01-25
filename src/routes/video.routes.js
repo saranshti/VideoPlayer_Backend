@@ -4,6 +4,7 @@ import {
   getCurrentUserVideos,
   getVideoById,
   streamVideo,
+  viewVideo,
   getAllVideos,
   updateVideoDetails,
   deleteVideo,
@@ -25,6 +26,7 @@ router.route("/video-create").post(
 router.route("/video-read-current-user").get(verifyJWT, getCurrentUserVideos);
 router.route("/video-get").get(verifyJWT, getAllVideos);
 router.route("/video-get/:id").get(verifyJWT, getVideoById);
+router.route("/video-view/:id").patch(verifyJWT, viewVideo);
 router.route("/video-stream/:id").get(verifyJWT, streamVideo);
 router.route("/video-update/:id").patch(verifyJWT, updateVideoDetails);
 router.route("/video-delete/:id").delete(verifyJWT, deleteVideo);
